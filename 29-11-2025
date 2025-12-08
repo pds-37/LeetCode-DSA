@@ -1,0 +1,122 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/* ---------------------- LC 322 (Coin Change) ---------------------- */
+class Solution322 {
+public:
+    int helper(vector<int>& coins, int amount, int idx, vector<vector<int>>& dp) {
+        if (amount == 0) return 0;
+        if (idx == coins.size() || amount < 0) return INT_MAX - 1;
+
+        if (dp[idx][amount] != -1) return dp[idx][amount];
+
+        int take = 1 + helper(coins, amount - coins[idx], idx, dp);
+        int skip = helper(coins, amount, idx + 1, dp);
+
+        return dp[idx][amount] = min(take, skip);
+    }
+
+    int coinChange(vector<int>& coins, int amount) {
+        int n = coins.size();
+        vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
+
+        int ans = helper(coins, amount, 0, dp);
+        return (ans == INT_MAX - 1) ? -1 : ans;
+    }
+};
+
+/* ---------------------- LC 518 (Coin Change II) ---------------------- */
+class Solution518 {
+public:
+    int change(int amount, vector<int>& coins) {
+        vector<int> dp(amount + 1, 0);
+        dp[0] = 1;
+
+        for (int coin : coins) {
+            for (int i = coin; i <= amount; i++)
+                dp[i] += dp[i - coin];
+        }
+        return dp[amount];
+    }
+};
+
+/* ---------------------- LC 55 (Jump Game) ---------------------- */
+class Solution55 {
+public:
+    bool canJump(vector<int>& nums) {
+        int far = 0, n = nums.size();
+        for (int i = 0; i < n; i++) {
+            if (i > far) return false;
+            far = max(far, nums[i] + i);
+        }
+        return true;
+    }
+};
+
+/* ---------------------- LC 45 (Jump Game II) ---------------------- */
+class Solution45 {
+public:
+    int jump(vector<int>& nums) {
+        int n = nums.size();
+        int jumps = 0, curr = 0, far = 0;
+
+        for (int i = 0; i < n - 1; i++) {
+            far = max(far, nums[i] + i);
+            if (i == curr) {
+                jumps++;
+                curr = far;
+            }
+        }
+        return jumps;
+    }
+};
+
+/* ---------------------- LC 1143 (Longest Common Subsequence) ---------------------- */
+class Solution1143 {
+public:
+    int lcs(string& s1, string& s2, int n, int m, vector<vector<int>>& dp) {
+        if (n == 0 || m == 0) return 0;
+
+        if (dp[n][m] != -1) return dp[n][m];
+
+        if (s1[n - 1] == s2[m - 1])
+            return dp[n][m] = 1 + lcs(s1, s2, n - 1, m - 1, dp);
+        else
+            return dp[n][m] = max(lcs(s1, s2, n - 1, m, dp),
+                                  lcs(s1, s2, n, m - 1, dp));
+    }
+
+    int longestCommonSubsequence(string text1, string text2) {
+        int n = text1.size(), m = text2.size();
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, -1));
+
+        return lcs(text1, text2, n, m, dp);
+    }
+};
+
+/* ---------------------- LC 5 (Longest Palindromic Substring) ---------------------- */
+class Solution5 {
+public:
+    bool isPalindrome(string& s, int i, int j) {
+        if (i >= j) return true;
+        if (s[i] == s[j]) return isPalindrome(s, i + 1, j - 1);
+        return false;
+    }
+
+    string longestPalindrome(string s) {
+        int n = s.size();
+        int maxLen = -1, start = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < n; j++) {
+                if (isPalindrome(s, i, j)) {
+                    if (j - i + 1 > maxLen) {
+                        maxLen = j - i + 1;
+                        start = i;
+                    }
+                }
+            }
+        }
+        return s.substr(start, maxLen);
+    }
+};

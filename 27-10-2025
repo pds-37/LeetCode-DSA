@@ -1,0 +1,77 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/* ---------------------- Question 70 (Climbing Stairs) ---------------------- */
+class Solution70 {
+public:
+    int helper(int n, vector<int>& dp) {
+        if (n == 1 || n == 2) return n;
+        if (n == 0) return 1;
+        if (n < 0) return 0;
+
+        if (dp[n] != -1) return dp[n];
+
+        dp[n] = helper(n - 1, dp) + helper(n - 2, dp);
+        return dp[n];
+    }
+
+    int climbStairs(int n) {
+        vector<int> dp(n + 1, -1);
+        return helper(n, dp);
+    }
+};
+
+/* ---------------------- Question 746 (Min Cost Climbing Stairs) ---------------------- */
+class Solution746 {
+public:
+    int helper(vector<int>& cost, vector<int>& dp, int idx) {
+        if (idx >= cost.size()) return 0;
+        if (dp[idx] != -1) return dp[idx];
+
+        int one = helper(cost, dp, idx + 1);
+        int two = helper(cost, dp, idx + 2);
+
+        dp[idx] = cost[idx] + min(one, two);
+        return dp[idx];
+    }
+
+    int minCostClimbingStairs(vector<int>& cost) {
+        vector<int> dp(cost.size(), -1);
+        return min(helper(cost, dp, 0), helper(cost, dp, 1));
+    }
+};
+
+/* ---------------------- Question 338 (Counting Bits) ---------------------- */
+class Solution338 {
+public:
+    vector<int> countBits(int n) {
+        vector<int> dp(n + 1, 0);
+        for (int i = 1; i <= n; i++) {
+            dp[i] = dp[i >> 1] + (i & 1);
+        }
+        return dp;
+    }
+};
+
+/* ---------------------- Question 279 (Perfect Squares) ---------------------- */
+class Solution279 {
+public:
+    int helper(int n, vector<int>& dp) {
+        if (n == 0) return 0;
+        if (dp[n] != -1) return dp[n];
+
+        int mini = INT_MAX;
+        for (int i = 1; i * i <= n; i++) {
+            int curr = 1 + helper(n - i * i, dp);
+            mini = min(mini, curr);
+        }
+
+        dp[n] = mini;
+        return dp[n];
+    }
+
+    int numSquares(int n) {
+        vector<int> dp(n + 1, -1);
+        return helper(n, dp);
+    }
+};

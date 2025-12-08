@@ -1,0 +1,241 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// Question 90
+class Solution90 {
+public:
+    void backtrack(int start, vector<int>& nums, vector<int>& current, vector<vector<int>>& result) {
+        result.push_back(current);
+        for (int i = start; i < nums.size(); i++) {
+            if (i > start && nums[i] == nums[i - 1]) continue;
+            current.push_back(nums[i]);
+            backtrack(i + 1, nums, current, result);
+            current.pop_back();
+        }
+    }
+
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
+        vector<int> current;
+        backtrack(0, nums, current, result);
+        return result;
+    }
+};
+
+// Question 37 (Sudoku Solver)
+class Solution37 {
+public:
+    bool isSafe(int row, int col, vector<vector<char>>& board, char num) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num) return false;
+            if (board[i][col] == num) return false;
+        }
+        int sRow = row / 3 * 3;
+        int sCol = col / 3 * 3;
+        for (int i = sRow; i < sRow + 3; i++) {
+            for (int j = sCol; j < sCol + 3; j++) {
+                if (board[i][j] == num) return false;
+            }
+        }
+        return true;
+    }
+
+    void solve(vector<vector<char>>& board, int row, int col, vector<vector<char>>& grid) {
+        if (row == 9) {
+            grid = board;
+            return;
+        }
+        if (board[row][col] != '.') {
+            if (col != 8) solve(board, row, col + 1, grid);
+            else solve(board, row + 1, 0, grid);
+        } else {
+            for (char ch = '1'; ch <= '9'; ch++) {
+                if (isSafe(row, col, board, ch)) {
+                    board[row][col] = ch;
+                    if (col != 8) solve(board, row, col + 1, grid);
+                    else solve(board, row + 1, 0, grid);
+                    board[row][col] = '.';
+                }
+            }
+        }
+    }
+
+    void solveSudoku(vector<vector<char>>& board) {
+        vector<vector<char>> grid(9, vector<char>(9));
+        solve(board, 0, 0, grid);
+        board = grid;
+    }
+};
+
+// Question 455
+class Solution455 {
+public:
+    int findContentChildren(vector<int>& g, vector<int>& s) {
+        sort(g.begin(), g.end());
+        sort(s.begin(), s.end());
+        int i = 0, j = 0, count = 0;
+        while (i < g.size() && j < s.size()) {
+            if (g[i] <= s[j]) {
+                count++; i++; j++;
+            } else {
+                j++;
+            }
+        }
+        return count;
+    }
+};
+
+// Question 509
+class Solution509 {
+public:
+    int fib(int n) {
+        if (n == 0) return 0;
+        if (n == 1 || n == 2) return 1;
+        return fib(n - 1) + fib(n - 2);
+    }
+};
+
+// Question 605
+class Solution605 {
+public:
+    bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+        int m = flowerbed.size(), count = 0;
+        for (int i = 0; i < m; i++) {
+            if (flowerbed[i] == 0) {
+                int prev = (i == 0) ? 0 : flowerbed[i - 1];
+                int next = (i == m - 1) ? 0 : flowerbed[i + 1];
+                if (prev == 0 && next == 0) {
+                    count++;
+                    flowerbed[i] = 1;
+                    if (count >= n) return true;
+                }
+            }
+        }
+        return count >= n;
+    }
+};
+
+// Question 860
+class Solution860 {
+public:
+    bool lemonadeChange(vector<int>& bills) {
+        int five = 0, ten = 0;
+        for (int b : bills) {
+            if (b == 5) five++;
+            else if (b == 10) {
+                if (five == 0) return false;
+                five--; ten++;
+            } else { // 20
+                if (five > 0 && ten > 0) {
+                    five--; ten--;
+                } else if (five >= 3) {
+                    five -= 3;
+                } else return false;
+            }
+        }
+        return true;
+    }
+};
+
+// Activity Selection
+class ActivitySelection {
+public:
+    int activitySelection(vector<int>& start, vector<int>& finish) {
+        int n = start.size();
+        vector<pair<int,int>> activities(n);
+        for (int i = 0; i < n; i++)
+            activities[i] = {finish[i], start[i]};
+
+        sort(activities.begin(), activities.end());
+
+        int count = 1;
+        int lastFinish = activities[0].first;
+
+        for (int i = 1; i < n; i++) {
+            if (activities[i].second >= lastFinish) {
+                count++;
+                lastFinish = activities[i].first;
+            }
+        }
+        return count;
+    }
+};
+
+// Question 322 Coin Change
+class Solution322 {
+public:
+    int helper(vector<int>& coins, int amount, int idx, vector<vector<int>>& dp) {
+        if (amount == 0) return 0;
+        if (idx == coins.size() || amount < 0) return INT_MAX - 1;
+
+        if (dp[idx][amount] != -1) return dp[idx][amount];
+
+        int ans1 = 1 + helper(coins, amount - coins[idx], idx, dp);
+        int ans2 = helper(coins, amount, idx + 1, dp);
+
+        return dp[idx][amount] = min(ans1, ans2);
+    }
+
+    int coinChange(vector<int>& coins, int amount) {
+        int n = coins.size();
+        vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
+
+        int ans = helper(coins, amount, 0, dp);
+        return (ans == INT_MAX - 1) ? -1 : ans;
+    }
+};
+
+// Question 769
+class Solution769 {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        int maxVal = 0, count = 0;
+        for (int i = 0; i < arr.size(); i++) {
+            maxVal = max(maxVal, arr[i]);
+            if (maxVal == i) count++;
+        }
+        return count;
+    }
+};
+
+// Question 768
+class Solution768 {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        int n = arr.size();
+        vector<int> rightMin(n + 1, INT_MAX);
+
+        for (int i = n - 1; i >= 0; i--)
+            rightMin[i] = min(rightMin[i + 1], arr[i]);
+
+        int leftMax = INT_MIN, count = 0;
+
+        for (int i = 0; i < n; i++) {
+            leftMax = max(leftMax, arr[i]);
+            if (leftMax <= rightMin[i + 1]) count++;
+        }
+        return count;
+    }
+};
+
+// 0/1 Knapsack
+class Knapsack {
+public:
+    int knapsack(int W, vector<int>& val, vector<int>& wt) {
+        int n = val.size();
+        vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= W; j++) {
+                int v = val[i - 1];
+                int w = wt[i - 1];
+                if (w <= j)
+                    dp[i][j] = max(v + dp[i - 1][j - w], dp[i - 1][j]);
+                else
+                    dp[i][j] = dp[i - 1][j];
+            }
+        }
+        return dp[n][W];
+    }
+};
