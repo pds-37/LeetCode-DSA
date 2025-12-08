@@ -1,0 +1,17 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        return nums[nums.size() / 2];
+    }
+};
+
+int main() {
+    Solution s;
+    vector<int> nums = {3,2,3};
+    cout << s.majorityElement(nums);
+    return 0;
+}
